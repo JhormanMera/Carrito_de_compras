@@ -7,11 +7,12 @@ import java.util.Set;
 
 @ApplicationPath("api")
 public class ApplicationConfig extends Application {
-
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> res = new HashSet<>();
-        //res.add(services.TestService.class);
+        res.add(services.OrderService.class);
+        res.add(services.ProductService.class);
+        res.add(services.UserService.class);
         return res;
     }
 }
