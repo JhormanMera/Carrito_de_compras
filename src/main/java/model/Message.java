@@ -1,8 +1,8 @@
 package model;
 
 public class Message {
-    String type;
-    String msg;
+    private String type;
+    private String msg;
 
     public Message(String type, String msg) {
         this.type = type;
