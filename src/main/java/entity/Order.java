@@ -2,19 +2,40 @@ package entity;
 
 public class Order {
     private int id;
-    private boolean payed;
+    private int payed;
     private long creationDate;
     private long paymentDate;
     private String userId;
+    private int productsAmount;
+    private double totalPrice;
 
-    public Order(int id, boolean payed, long creationDate, long paymentDate, String userId) {
+    public Order(int id, int payed, long creationDate, long paymentDate, String userId, int productsAmount, double totalPrice) {
         this.id = id;
         this.payed = payed;
         this.creationDate = creationDate;
         this.paymentDate = paymentDate;
         this.userId = userId;
+        this.productsAmount = productsAmount;
+        this.totalPrice = totalPrice;
     }
 
+    public int getProductsAmount() {
+        return productsAmount;
+    }
+
+    public void setProductsAmount(int productsAmount) {
+        this.productsAmount = productsAmount;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public Order(){}
     public int getId() {
         return id;
     }
@@ -23,11 +44,11 @@ public class Order {
         this.id = id;
     }
 
-    public boolean isPayed() {
+    public int getPayed() {
         return payed;
     }
 
-    public void setPayed(boolean payed) {
+    public void setPayed(int payed) {
         this.payed = payed;
     }
 

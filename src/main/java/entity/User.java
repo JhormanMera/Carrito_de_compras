@@ -19,6 +19,8 @@ public class User {
         this.natId = natId;
     }
 
+    public User( ) {    }
+
     public String getNatId() {
         return natId;
     }
