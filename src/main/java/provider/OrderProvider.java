@@ -104,7 +104,7 @@ public class OrderProvider {
             int amount = results.getInt("amount");
 
             totalAmount += amount;
-            totalPrice += price;
+            totalPrice += price*amount;
 
             Product product = new Product(id, name, amount, price);
             products.add(product);
