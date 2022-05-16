@@ -16,8 +16,8 @@ public class OrderProvider {
 
     public void addOrder(Order order) throws SQLException, ClassNotFoundException {
         DbConnection conn = new DbConnection();
-        String sql="INSERT INTO ordersA00369206 (creationDate, userID) VALUES ($CREATIONDATE,'$USERID')";
-        sql= sql.replace("$CREATIONDATE", Long.toString(new Date().getTime()));
+        String sql = "INSERT INTO ordersA00369206 (creationDate, userID) VALUES ($CREATIONDATE,'$USERID')";
+        sql = sql.replace("$CREATIONDATE", Long.toString(new Date().getTime()));
         sql = sql.replace("$USERID", order.getUserId());
         conn.runQuery(sql);
         conn.close();
@@ -27,7 +27,7 @@ public class OrderProvider {
 
         DbConnection conn = new DbConnection();
 
-        String sql="UPDATE ordersA00369206 SET payed = 1 WHERE id = $ID";
+        String sql = "UPDATE ordersA00369206 SET payed = 1 WHERE id = $ID";
 
         long time = System.currentTimeMillis();
 
@@ -45,10 +45,10 @@ public class OrderProvider {
         sql = sql.replace("$PAYDATE", Long.toString(time));
 
         //ArrayList<Order> orders = new ArrayList<>();
-        Order order=new Order();
-        ResultSet results =  conn.getData(sql);
+        Order order = new Order();
+        ResultSet results = conn.getData(sql);
 
-        while(results.next()){
+        while (results.next()) {
 
             int id = results.getInt("id");
 
@@ -60,7 +60,7 @@ public class OrderProvider {
 
             String userId = results.getString("userID");
 
-            order = new Order(id, payed, Long.parseLong(creationDate),Long.parseLong(paymentDate), userId);
+            order = new Order(id, payed, Long.parseLong(creationDate), Long.parseLong(paymentDate), userId);
 
         }
         conn.close();
@@ -73,10 +73,10 @@ public class OrderProvider {
 
         ProductProvider provider = new ProductProvider();
 
-        String sql="INSERT INTO orders_productsA00369206 (orderID, productID,amount) VALUES ($ORDERID,$PRODUCTID,$QUANTITY)";
+        String sql = "INSERT INTO orders_productsA00369206 (orderID, productID,amount) VALUES ($ORDERID,$PRODUCTID,$QUANTITY)";
 
-        sql= sql.replace("$ORDERID", Integer.toString(order.getOrderID()));
-        sql= sql.replace("$PRODUCTID", Integer.toString(order.getProductID()));
+        sql = sql.replace("$ORDERID", Integer.toString(order.getOrderID()));
+        sql = sql.replace("$PRODUCTID", Integer.toString(order.getProductID()));
         sql = sql.replace("$QUANTITY", Integer.toString(order.getAmount()));
 
         conn.runQuery(sql);
@@ -91,11 +91,11 @@ public class OrderProvider {
                 "ON productsA00369206.id = orders_productsA00369206.productID)INNER JOIN ordersA00369206 ON orders_productsA00369206.orderID = ordersA00369206.id WHERE ordersA00369206.id = $ORDERID";
         sql = sql.replace("$ORDERID", info);
         ArrayList<Product> products = new ArrayList<>();
-        int totalPrice=0;
-        int totalAmount=0;
-        ResultSet results =  conn.getData(sql);
+        int totalPrice = 0;
+        int totalAmount = 0;
+        ResultSet results = conn.getData(sql);
 
-        while(results.next()){
+        while (results.next()) {
 
             int id = results.getInt("id");
 
@@ -105,62 +105,61 @@ public class OrderProvider {
 
             int amount = results.getInt("amount");
 
-            totalAmount+=amount;
-            totalPrice+=price;
+            totalAmount += amount;
+            totalPrice += price;
 
-            Product product = new Product(id,name,amount,price);
+            Product product = new Product(id, name, amount, price);
             products.add(product);
         }
 
-        OrderInfo answer = new OrderInfo(Integer.parseInt(info),products,totalAmount,totalPrice);
+        OrderInfo answer = new OrderInfo(Integer.parseInt(info), products, totalAmount, totalPrice);
 
         conn.close();
         return answer;
     }
 
-    public void deleteProductFromOrder(String[] parts) throws SQLException, ClassNotFoundException {
+    public void removeProductQuantityFromOrder(ModifyOrder order) throws SQLException, ClassNotFoundException {
 
         DbConnection conn = new DbConnection();
 
-        String productName = parts[1];
+        String sql = "SELECT * FROM orders_productsA00369206 WHERE orderID = $ORDERID AND productID = $PRODUCTID";
+        sql = sql.replace("$ORDERID",  Integer.toString(order.getOrderID()));
+        sql = sql.replace("$PRODUCTID",  Integer.toString(order.getProductID()));
 
-        ProductProvider provider = new ProductProvider();
+        Product product = new Product();
+        ResultSet results =  conn.getData(sql);
+        int amount=0;
 
-        String sql="DELETE FROM orders_productsA00369206 WHERE orderId = $ORRDERID AND productId = $PRODUCTID";
-        sql= sql.replace("$ORRDERID", parts[0]); //Hacer cambio a time unix
-        int id = provider.findProductId(productName);
-
-        if(id==0){
-            conn.close();
-            return;
-        }else{
-            sql = sql.replace("$PRODUCTID", Integer.toString(id));
-            conn.runQuerry(sql);
-            conn.close();
+        while(results.next()){
+            amount = results.getInt("amount");
         }
-    }
 
-    public void removeProductFromOrder(OrderChange order) throws SQLException, ClassNotFoundException {
+        if((amount-order.getAmount())>0) {
+            sql="UPDATE orders_productsA00369206 SET amount = $QUANTITY WHERE orderID = $ORDERID AND productID = $PRODUCTID";
+            sql= sql.replace("$ORDERID",  Integer.toString(order.getOrderID()));
+            sql = sql.replace("$QUANTITY",    Integer.toString(amount-order.getAmount()));
+            sql = sql.replace("$PRODUCTID", Integer.toString(order.getProductID()));
 
-        DbConnection conn = new DbConnection();
-
-        ProductProvider provider = new ProductProvider();
-
-        String sql="UPDATE orders_productsA00369206 SET quantity = $QUANTITY WHERE orderId = $ORDERID AND productId = $PRODUCTID";
-        sql= sql.replace("$ORDERID",  Integer.toString(order.getOrderId())); //Hacer cambio a time unix
-        sql = sql.replace("$QUANTITY",    Integer.toString(order.getQuantity()));
-        int id = provider.findProductId(order.getProductName());
-
-        if(id==0){
-            conn.close();
-            return;
-        }else {
-
-            sql = sql.replace("$PRODUCTID", Integer.toString(id));
             System.out.println(sql);
-            conn.runQuerry(sql);
+            conn.runQuery(sql);
+            conn.close();
+        }else{
+            deleteProductFromOrder(order);
             conn.close();
         }
     }
-}
 
+    public void deleteProductFromOrder(ModifyOrder order) throws SQLException, ClassNotFoundException {
+
+        DbConnection conn = new DbConnection();
+
+        ProductProvider provider = new ProductProvider();
+
+        String sql="DELETE FROM orders_productsA00369206 WHERE orderID = $ORRDERID AND productID = $PRODUCTID";
+        sql= sql.replace("$ORRDERID", Integer.toString(order.getOrderID()));
+        sql = sql.replace("$PRODUCTID", Integer.toString(order.getProductID()));
+        conn.runQuery(sql);
+        conn.close();
+    }
+
+}

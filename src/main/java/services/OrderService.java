@@ -28,8 +28,6 @@ public class OrderService {
             Message m = new Message("Class not found Except", ex.getMessage());
             return Response.status(500).entity(m).build();
         }
-
-
     }
 
     @PUT
@@ -43,7 +41,6 @@ public class OrderService {
             provider.addProductToOrder(order);
             return Response.status(200).entity(order).build();
         } catch (SQLException e) {
-
             Message m = new Message("SQL Exception", e.getMessage());
             return Response.status(500).entity(m).build();
         } catch (ClassNotFoundException ex) {
@@ -62,14 +59,12 @@ public class OrderService {
             Order order = provider.updateStatus(info);
             return Response.status(200).entity(order).build();
         } catch (SQLException e) {
-
             Message m = new Message("SQL Exception", e.getMessage());
             return Response.status(500).entity(m).build();
         } catch (ClassNotFoundException ex) {
             Message m = new Message("Class not found Except", ex.getMessage());
             return Response.status(500).entity(m).build();
         }
-
     }
     @GET
     @Path("getInfoOrder/{info}")
@@ -81,7 +76,6 @@ public class OrderService {
             OrderInfo data = provider.getInfoFromOrder(info);
             return Response.status(200).entity(data).build();
         } catch (SQLException e) {
-
             Message m = new Message("SQL Exception", e.getMessage());
             return Response.status(500).entity(m).build();
         } catch (ClassNotFoundException ex) {
@@ -89,36 +83,34 @@ public class OrderService {
             return Response.status(500).entity(m).build();
         }
     }
-    @DELETE
-    @Path("deleteProductFromOrder/{info}")
-    @Produces("application/json")
-    @Consumes("application/json")
-    public Response deleteProductFromOrder(@PathParam("info") String info){
-
-        String parts[] = info.split("-");
-        OrderProvider provider = new OrderProvider();
-        try {
-            provider.deleteProductFromOrder(parts);
-            return Response.status(200).entity(parts).build();
-        } catch (SQLException e) {
-
-            Message m = new Message("SQL Exception", e.getMessage());
-            return Response.status(500).entity(m).build();
-        } catch (ClassNotFoundException ex) {
-            Message m = new Message("Class not found Except", ex.getMessage());
-            return Response.status(500).entity(m).build();
-        }
-    }
-
     @PUT
-    @Path("removeProductFromOrder")
+    @Path("removeProductQuantityFromOrder")
     @Produces("application/json")
     @Consumes("application/json")
     public Response removeProductFromOrder(ModifyOrder order){
 
         OrderProvider provider = new OrderProvider();
         try {
-            provider.removeProductFromOrder(order);
+            provider.removeProductQuantityFromOrder(order);
+            return Response.status(200).entity(order).build();
+        } catch (SQLException e) {
+            Message m = new Message("SQL Exception", e.getMessage());
+            return Response.status(500).entity(m).build();
+        } catch (ClassNotFoundException ex) {
+            Message m = new Message("Class not found Except", ex.getMessage());
+            return Response.status(500).entity(m).build();
+        }
+    }
+
+    @DELETE
+    @Path("deleteProductFromOrder")
+    @Produces("application/json")
+    @Consumes("application/json")
+    public Response deleteProductFromOrder(ModifyOrder order){
+
+        OrderProvider provider = new OrderProvider();
+        try {
+            provider.deleteProductFromOrder(order);
             return Response.status(200).entity(order).build();
         } catch (SQLException e) {
 
@@ -130,10 +122,5 @@ public class OrderService {
         }
 
     }
-
-
-
-
-
 
 }
