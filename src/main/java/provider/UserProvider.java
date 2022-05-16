@@ -23,7 +23,7 @@ public class UserProvider {
 
         DbConnection conn = new DbConnection();
 
-        String sql = "SELECT ordersA00369206.id, ordersA00369206.creationDate, ordersA00369206.paymentDate, ordersA00369206.productsAmount, ordersA00369206.totalPrice FROM ordersA00369206 WHERE ordersA00369206.userID = '$ORDERID'" ;
+        String sql = "SELECT ordersA00369206.id, ordersA00369206.creationDate, ordersA00369206.paymentDate FROM ordersA00369206 WHERE ordersA00369206.userID = '$ORDERID'" ;
 
         sql = sql.replace("$ORDERID",natID);
         ResultSet results =  conn.getData(sql);
@@ -37,15 +37,11 @@ public class UserProvider {
 
             String paymentDate = results.getString("paymentDate");
 
-            int amount = results.getInt("productsAmount");
-
-            int price = results.getInt("totalPrice");
-
             if(!paymentDate.equals("0")){
                 payed=1;
             }
 
-            Order order = new Order(id, payed, Long.parseLong(creationDate), Long.parseLong(paymentDate), natID, amount, price);
+            Order order = new Order(id, payed, Long.parseLong(creationDate), Long.parseLong(paymentDate), natID);
             orders.add(order);
         }
 
