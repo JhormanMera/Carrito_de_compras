@@ -85,7 +85,7 @@ public class OrderProvider {
 
         DbConnection conn = new DbConnection();
 
-        String sql = "SELECT productsA00369206.id, productsA00369206.name, productsA00369206.price, ordersA00369206.id, orders_productsA00369206.amount FROM (productsA00369206 INNER JOIN orders_productsA00369206" +
+        String sql = "SELECT productsA00369206.id, productsA00369206.name, productsA00369206.price, ordersA00369206.id, orders_productsA00369206.amount FROM (productsA00369206 INNER JOIN orders_productsA00369206 " +
                 "ON productsA00369206.id = orders_productsA00369206.productID)INNER JOIN ordersA00369206 ON orders_productsA00369206.orderID = ordersA00369206.id WHERE ordersA00369206.id = $ORDERID";
         sql = sql.replace("$ORDERID", info);
         ArrayList<Product> products = new ArrayList<>();
