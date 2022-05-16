@@ -3,11 +3,11 @@ package provider;
 import db.DbConnection;
 import entity.Order;
 import entity.Product;
+import model.ModifyOrder;
 import model.OrderInfo;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -67,21 +67,55 @@ public class OrderProvider {
         return order;
     }
 
-    public void addProductToOrder(OrderChange order) throws SQLException, ClassNotFoundException {
+    public void addProductToOrder(ModifyOrder order) throws SQLException, ClassNotFoundException {
 
         DbConnection conn = new DbConnection();
 
         ProductProvider provider = new ProductProvider();
 
-        String sql="INSERT INTO orders_productsA00369206 (orderID, productID,Amount) VALUES ('$ORDERID','$PRODUCTID','$QUANTITY')";
+        String sql="INSERT INTO orders_productsA00369206 (orderID, productID,amount) VALUES ($ORDERID,$PRODUCTID,$QUANTITY)";
 
-        //sql= sql.replace("$ORDERID", order.getOrderId());
-        //sql = sql.replace("$QUANTITY", Integer.toString(order.getQuantity()));
-        //int id = provider.findProductId(order.getProductName());
+        sql= sql.replace("$ORDERID", Integer.toString(order.getOrderID()));
+        sql= sql.replace("$PRODUCTID", Integer.toString(order.getProductID()));
+        sql = sql.replace("$QUANTITY", Integer.toString(order.getAmount()));
 
-        sql = sql.replace("$PRODUCTID", "");
         conn.runQuery(sql);
         conn.close();
+    }
+
+    public OrderInfo getInfoFromOrder(String info) throws SQLException, ClassNotFoundException {
+
+        DbConnection conn = new DbConnection();
+
+        String sql = "SELECT productsA00369206.id, productsA00369206.name, productsA00369206.price, ordersA00369206.id, orders_productsA00369206.amount FROM (productsA00369206 INNER JOIN orders_productsA00369206" +
+                "ON productsA00369206.id = orders_productsA00369206.productID)INNER JOIN ordersA00369206 ON orders_productsA00369206.orderID = ordersA00369206.id WHERE ordersA00369206.id = $ORDERID";
+        sql = sql.replace("$ORDERID", info);
+        ArrayList<Product> products = new ArrayList<>();
+        int totalPrice=0;
+        int totalAmount=0;
+        ResultSet results =  conn.getData(sql);
+
+        while(results.next()){
+
+            int id = results.getInt("id");
+
+            String name = results.getString("name");
+
+            int price = results.getInt("price");
+
+            int amount = results.getInt("amount");
+
+            totalAmount+=amount;
+            totalPrice+=price;
+
+            Product product = new Product(id,name,amount,price);
+            products.add(product);
+        }
+
+        OrderInfo answer = new OrderInfo(Integer.parseInt(info),products,totalAmount,totalPrice);
+
+        conn.close();
+        return answer;
     }
 
     public void deleteProductFromOrder(String[] parts) throws SQLException, ClassNotFoundException {
@@ -89,7 +123,7 @@ public class OrderProvider {
         DbConnection conn = new DbConnection();
 
         String productName = parts[1];
-        
+
         ProductProvider provider = new ProductProvider();
 
         String sql="DELETE FROM orders_productsA00369206 WHERE orderId = $ORRDERID AND productId = $PRODUCTID";
@@ -127,42 +161,6 @@ public class OrderProvider {
             conn.runQuerry(sql);
             conn.close();
         }
-    }
-
-    public OrderInfo getInfoFromOrder(String info) throws SQLException, ClassNotFoundException {
-
-        DbConnection conn = new DbConnection();
-
-        String sql = "SELECT productsA00369206.id, productsA00369206.name, productsA00369206.price, ordersA00369206.id, orders_productsA00369206.amount FROM (productsA00369206 INNER JOIN orders_productsA00369206" +
-                "ON productsA00369206.id = orders_productsA00369206.productID)INNER JOIN ordersA00369206 ON orders_productsA00369206.orderID = ordersA00369206.id WHERE ordersA00369206.id = $ORDERID";
-        sql = sql.replace("$ORDERID", info);
-        ArrayList<Product> products = new ArrayList<>();
-        int totalPrice=0;
-        int totalAmount=0;
-        ResultSet results =  conn.getData(sql);
-
-        while(results.next()){
-
-            int id = results.getInt("id");
-
-            String name = results.getString("name");
-
-            int price = results.getInt("price");
-
-            int amount = results.getInt("amount");
-
-            totalAmount+=amount;
-            totalPrice+=price;
-
-            Product product = new Product(id,name,amount,price);
-            products.add(product);
-        }
-
-        OrderInfo answer = new OrderInfo(Integer.parseInt(info),products,totalAmount,totalPrice);
-
-        conn.close();
-        return answer;
-
     }
 }
 
