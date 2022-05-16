@@ -44,7 +44,7 @@ public class UserProvider {
             Order order = new Order(id, payed, Long.parseLong(creationDate), Long.parseLong(paymentDate), natID);
             orders.add(order);
         }
-
+        conn.close();
         return orders;
 
     }
