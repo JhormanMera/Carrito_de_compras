@@ -73,7 +73,7 @@ public class OrderProvider {
 
         ProductProvider provider = new ProductProvider();
 
-        String sql = "INSERT INTO orders_productsA00369206 (orderID, productID,amount) VALUES ('$ORDERID','$PRODUCTID','$QUANTITY')";
+        String sql = "INSERT INTO orders_productsA00369206 (orderID, productID,amount) VALUES ('$ORDERID','$PRODUCTID',$QUANTITY)";
 
         sql = sql.replace("$ORDERID", Integer.toString(order.getOrderID()));
         sql = sql.replace("$PRODUCTID", Integer.toString(order.getProductID()));
