@@ -12,6 +12,9 @@ public class ModifyOrder {
         this.amount = amount;
     }
 
+    public ModifyOrder() {
+    }
+
     public int getOrderID() {
         return orderID;
     }
